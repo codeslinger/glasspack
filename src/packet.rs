@@ -1,14 +1,13 @@
-use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
-use std::hash::{Hash, Hasher};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 // Buffer space, sized to make the Packet structure fit in 2048 bytes (i.e. half
 // a page on Linux)
 const PACKET_BUF_SIZE: usize = 2000;
 
 pub struct Packet {
-    src: SocketAddr,
-    len: usize,
-    buf: [u8; PACKET_BUF_SIZE],
+    pub src: SocketAddr,
+    pub len: usize,
+    pub buf: [u8; PACKET_BUF_SIZE],
 }
 
 impl Packet {
@@ -20,20 +19,7 @@ impl Packet {
         }
     }
 
-    pub fn recv(&mut self, socket: &UdpSocket) -> std::io::Result<()> {
-        let (n, src) = socket.recv_from(&mut self.buf)?;
-        self.len = n;
-        self.src = src;
-        Ok(())
-    }
-
-    //pub fn payload(&self) -> &[u8] {
-    //    &self.buf[..self.len]
-    //}
-}
-
-impl Hash for Packet {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.src.hash(state);
+    pub fn payload(&self) -> &[u8] {
+        &self.buf[..self.len]
     }
 }
